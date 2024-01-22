@@ -1,6 +1,8 @@
 package models
 
-import "github.com/jinzhu/gorm"
+import (
+	"github.com/jinzhu/gorm"
+)
 
 type InstallmentStatus int
 
@@ -8,7 +10,9 @@ const (
 	InstallmentStatusUnknown    InstallmentStatus = -1
 	InstallmentStatusInProgress InstallmentStatus = 1
 	InstallmentStatusSettled    InstallmentStatus = 2
-	InstallmentStatusFailed     InstallmentStatus = 3
+	InstallmentStatusCancelled  InstallmentStatus = 3
+	InstallmentStatusOverdue    InstallmentStatus = 3
+	InstallmentStatusFailed     InstallmentStatus = 4
 )
 
 type Installment struct {
@@ -20,6 +24,8 @@ type Installment struct {
 	InterestAmount    int
 	InstallmentAmount int
 	Status            InstallmentStatus
+	OverdueAmount     int
+	OverdueDays       int
 }
 
 var InstallmentStatusSelectorString = map[int]string{
