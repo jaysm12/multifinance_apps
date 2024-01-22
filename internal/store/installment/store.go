@@ -11,11 +11,8 @@ import (
 // InstallmentStoreMethod is set of methods for interacting with a installment storage system
 type InstallmentStoreMethod interface {
 	CreateInstallment(installmentinfo models.Installment) error
+	GetInstallmentInfoByID(installmentid uint) (models.Installment, error)
 	UpdateInstallment(installmentinfo models.Installment) error
-	DeleteInstallment(installmentid int) error
-	GetInstallmentInfoByInstallmentname(installmentname string) (models.Installment, error)
-	GetInstallmentInfoByID(installmentid int) (models.Installment, error)
-	Count() (int, error)
 }
 
 // InstallmentStore is list dependencies installment store
@@ -64,39 +61,7 @@ func (u *InstallmentStore) UpdateInstallment(installmentinfo models.Installment)
 	return nil
 }
 
-// GetInstallmentID is func to get installment id by installmentname and password
-func (u *InstallmentStore) GetInstallmentInfoByInstallmentname(installmentname string) (models.Installment, error) {
-	var installment models.Installment
-	db, err := u.getDB()
-	if err != nil {
-		return models.Installment{}, err
-	}
-
-	if err := db.Where("installmentname = ?", installmentname).First(&installment).Error; err != nil {
-		return models.Installment{}, err
-	}
-
-	return installment, nil
-}
-
-// DeleteInstallment is func to delete installment info on database
-func (u *InstallmentStore) DeleteInstallment(installmentid int) error {
-	db, err := u.getDB()
-	if err != nil {
-		return err
-	}
-
-	installment := models.Installment{
-		Model: gorm.Model{
-			ID: uint(installmentid),
-		},
-	}
-
-	return db.Delete(&installment).Error
-}
-
-// GetInstallmentByID is func to get installment info by id on database
-func (u *InstallmentStore) GetInstallmentInfoByID(installmentid int) (models.Installment, error) {
+func (u *InstallmentStore) GetInstallmentInfoByID(installmentid uint) (models.Installment, error) {
 	var installment models.Installment
 	db, err := u.getDB()
 	if err != nil {
@@ -108,20 +73,4 @@ func (u *InstallmentStore) GetInstallmentInfoByID(installmentid int) (models.Ins
 	}
 
 	return installment, nil
-}
-
-// Count is func to get total installment on database
-func (u *InstallmentStore) Count() (int, error) {
-	var installment models.Installment
-	db, err := u.getDB()
-	if err != nil {
-		return 0, err
-	}
-
-	var count int
-	if err := db.Model(&installment).Count(&count).Error; err != nil {
-		return 0, err
-	}
-
-	return count, nil
 }

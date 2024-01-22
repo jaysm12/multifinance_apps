@@ -126,19 +126,22 @@ func (u *UserService) CreateUserKyc(request CreateUserKycRequest) error {
 	// default credit limit
 	creditInfo := []models.CreditLimit{
 		{
-			UserID: uint(request.UserId),
-			Amount: 10000000,
-			Tenor:  4,
+			UserID:        uint(request.UserId),
+			DefaultAmount: 100000000,
+			CurrentAmount: 100000000,
+			Tenor:         12,
 		},
 		{
-			UserID: uint(request.UserId),
-			Amount: 50000000,
-			Tenor:  8,
+			UserID:        uint(request.UserId),
+			DefaultAmount: 500000000,
+			CurrentAmount: 500000000,
+			Tenor:         24,
 		},
 		{
-			UserID: uint(request.UserId),
-			Amount: 1000000,
-			Tenor:  1,
+			UserID:        uint(request.UserId),
+			DefaultAmount: 800000000,
+			CurrentAmount: 800000000,
+			Tenor:         36,
 		},
 	}
 

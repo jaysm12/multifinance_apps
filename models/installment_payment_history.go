@@ -12,6 +12,5 @@ type InstallmentPaymentHistory struct {
 	ContractID        string
 	InstallmentNumber int
 	PaymentDate       time.Time
-	PaidAmount        int
-	RemainingAmount   int
+	PaidAmount        float64
 }

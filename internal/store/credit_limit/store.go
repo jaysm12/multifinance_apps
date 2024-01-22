@@ -12,9 +12,8 @@ import (
 type CreditLimitStoreMethod interface {
 	CreateCreditLimitBulk(creditLimitinfo []models.CreditLimit) error
 	UpdateCreditLimit(creditLimitinfo models.CreditLimit) error
-	DeleteCreditLimit(creditLimitid int) error
-	GetCreditLimitInfoByCreditLimitname(creditLimitname string) (models.CreditLimit, error)
-	GetCreditLimitInfoByID(creditLimitid int) (models.CreditLimit, error)
+	DeleteCreditLimit(creditLimitid uint) error
+	GetCreditLimitInfoByID(creditLimitid uint) (models.CreditLimit, error)
 	Count() (int, error)
 }
 
@@ -64,23 +63,8 @@ func (u *CreditLimitStore) UpdateCreditLimit(creditLimitinfo models.CreditLimit)
 	return nil
 }
 
-// GetCreditLimitID is func to get creditLimit id by creditLimitname and password
-func (u *CreditLimitStore) GetCreditLimitInfoByCreditLimitname(creditLimitname string) (models.CreditLimit, error) {
-	var creditLimit models.CreditLimit
-	db, err := u.getDB()
-	if err != nil {
-		return models.CreditLimit{}, err
-	}
-
-	if err := db.Where("creditLimitname = ?", creditLimitname).First(&creditLimit).Error; err != nil {
-		return models.CreditLimit{}, err
-	}
-
-	return creditLimit, nil
-}
-
 // DeleteCreditLimit is func to delete creditLimit info on database
-func (u *CreditLimitStore) DeleteCreditLimit(creditLimitid int) error {
+func (u *CreditLimitStore) DeleteCreditLimit(creditLimitid uint) error {
 	db, err := u.getDB()
 	if err != nil {
 		return err
@@ -96,7 +80,7 @@ func (u *CreditLimitStore) DeleteCreditLimit(creditLimitid int) error {
 }
 
 // GetCreditLimitByID is func to get creditLimit info by id on database
-func (u *CreditLimitStore) GetCreditLimitInfoByID(creditLimitid int) (models.CreditLimit, error) {
+func (u *CreditLimitStore) GetCreditLimitInfoByID(creditLimitid uint) (models.CreditLimit, error) {
 	var creditLimit models.CreditLimit
 	db, err := u.getDB()
 	if err != nil {

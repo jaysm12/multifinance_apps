@@ -17,15 +17,21 @@ const (
 
 type Installment struct {
 	gorm.Model
-	ContractID        string
-	AssetName         string
-	OtrAmount         int
-	AdminFee          int
-	InterestAmount    int
-	InstallmentAmount int
-	Status            InstallmentStatus
-	OverdueAmount     int
-	OverdueDays       int
+	CreditLimitID          uint
+	ContractID             string
+	AssetName              string
+	OtrAmount              float64
+	AdminFee               int
+	TotalInterest          float64
+	MonthlyAmount          float64
+	TotalInstallmentAmount float64
+	InterestRate           float64
+	InterestPerMonth       float64
+	Status                 InstallmentStatus
+	OverdueAmount          int
+	OverdueDays            int
+	Tenor                  int
+	RemainingAmount        float64
 }
 
 var InstallmentStatusSelectorString = map[int]string{
