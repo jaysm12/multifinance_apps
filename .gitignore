@@ -19,5 +19,7 @@
 
 volumes/
 
+vendor/
+
 # Go workspace file
 go.work
