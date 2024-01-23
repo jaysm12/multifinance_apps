@@ -11,7 +11,7 @@ import (
 // InstallmentStoreMethod is set of methods for interacting with a installment storage system
 type InstallmentStoreMethod interface {
 	CreateInstallment(installmentinfo models.Installment) error
-	GetInstallmentInfoByID(installmentid uint) (models.Installment, error)
+	GetInstallmentInfoByContractId(contractId string) (models.Installment, error)
 	UpdateInstallment(installmentinfo models.Installment) error
 }
 
@@ -61,15 +61,16 @@ func (u *InstallmentStore) UpdateInstallment(installmentinfo models.Installment)
 	return nil
 }
 
-func (u *InstallmentStore) GetInstallmentInfoByID(installmentid uint) (models.Installment, error) {
+func (u *InstallmentStore) GetInstallmentInfoByContractId(contractId string) (models.Installment, error) {
 	var installment models.Installment
 	db, err := u.getDB()
 	if err != nil {
 		return models.Installment{}, err
 	}
 
-	if err := db.First(&installment, installmentid).Error; err != nil {
-		return models.Installment{}, err
+	result := db.Model(models.Installment{}).Where("contract_id = ?", contractId).First(&installment)
+	if result.Error != nil {
+		return models.Installment{}, result.Error
 	}
 
 	return installment, nil

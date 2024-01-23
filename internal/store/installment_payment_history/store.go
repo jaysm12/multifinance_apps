@@ -12,6 +12,7 @@ import (
 type InstallmentPaymentHistoryStoreMethod interface {
 	CreateInstallmentPaymentHistory(installmentPaymentHistoryinfo models.InstallmentPaymentHistory) error
 	GetInstallmentPaymentHistoryInfoByID(installmentPaymentHistoryid int) (models.InstallmentPaymentHistory, error)
+	GetLatestHistoryByInstallmentId(installmentID uint) (models.InstallmentPaymentHistory, error)
 }
 
 // InstallmentPaymentHistoryStore is list dependencies installmentPaymentHistory store
@@ -54,6 +55,20 @@ func (u *InstallmentPaymentHistoryStore) GetInstallmentPaymentHistoryInfoByID(in
 	}
 
 	if err := db.First(&installmentPaymentHistory, installmentPaymentHistoryid).Error; err != nil {
+		return models.InstallmentPaymentHistory{}, err
+	}
+
+	return installmentPaymentHistory, nil
+}
+
+func (u *InstallmentPaymentHistoryStore) GetLatestHistoryByInstallmentId(installmentID uint) (models.InstallmentPaymentHistory, error) {
+	var installmentPaymentHistory models.InstallmentPaymentHistory
+	db, err := u.getDB()
+	if err != nil {
+		return models.InstallmentPaymentHistory{}, err
+	}
+
+	if err := db.Where("installment_id = ?", installmentID).Last(&installmentPaymentHistory).Error; err != nil {
 		return models.InstallmentPaymentHistory{}, err
 	}
 

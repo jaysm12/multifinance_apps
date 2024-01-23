@@ -21,7 +21,7 @@ type TokenMethod interface {
 
 // TokenBody is list parameter that will be stored as token
 type TokenBody struct {
-	UserID int
+	UserID uint
 }
 
 // NewTokenMethod is func to generate TokenMethod interface
@@ -61,7 +61,7 @@ func (t TokenConfig) ValidateToken(tokenString string) (TokenBody, error) {
 		}
 
 		if userIDFloat64 > 0 {
-			return TokenBody{UserID: int(userIDFloat64)}, nil
+			return TokenBody{UserID: uint(userIDFloat64)}, nil
 		}
 	}
 	return TokenBody{}, fmt.Errorf("invalid Token")

@@ -12,9 +12,9 @@ import (
 type UserStoreMethod interface {
 	CreateUser(userinfo models.User) error
 	UpdateUser(userinfo models.User) error
-	DeleteUser(userid int) error
+	DeleteUser(userid uint) error
 	GetUserInfoByUsername(username string) (models.User, error)
-	GetUserInfoByID(userid int) (models.User, error)
+	GetUserInfoByID(userid uint) (models.User, error)
 	Count() (int, error)
 }
 
@@ -86,7 +86,7 @@ func (u *UserStore) GetUserInfoByUsername(username string) (models.User, error) 
 }
 
 // DeleteUser is func to delete user info on database
-func (u *UserStore) DeleteUser(userid int) error {
+func (u *UserStore) DeleteUser(userid uint) error {
 	db, err := u.getDB()
 	if err != nil {
 		return err
@@ -102,7 +102,7 @@ func (u *UserStore) DeleteUser(userid int) error {
 }
 
 // GetUserByID is func to get user info by id on database
-func (u *UserStore) GetUserInfoByID(userid int) (models.User, error) {
+func (u *UserStore) GetUserInfoByID(userid uint) (models.User, error) {
 	var user models.User
 	db, err := u.getDB()
 	if err != nil {

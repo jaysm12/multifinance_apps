@@ -1,7 +1,7 @@
 package user
 
 import (
-	creditLimit "github.com/jaysm12/multifinance-apps/internal/store/credit_limit"
+	creditOption "github.com/jaysm12/multifinance-apps/internal/store/credit_limit"
 	"github.com/jaysm12/multifinance-apps/internal/store/user"
 	userkyc "github.com/jaysm12/multifinance-apps/internal/store/user_kyc"
 	"github.com/jaysm12/multifinance-apps/models"
@@ -15,23 +15,23 @@ type UserServiceMethod interface {
 
 // UserService is list dependencies for user service
 type UserService struct {
-	userStore        user.UserStoreMethod
-	userKycStore     userkyc.UserKYCStoreMethod
-	creditLimitStore creditLimit.CreditLimitStoreMethod
+	userStore         user.UserStoreMethod
+	userKycStore      userkyc.UserKYCStoreMethod
+	creditOptionStore creditOption.CreditOptionStoreMethod
 }
 
 // NewUserService is func to generate UserServiceMethod interface
-func NewUserService(userStore user.UserStoreMethod, userKycStore userkyc.UserKYCStoreMethod, creditLimitStore creditLimit.CreditLimitStoreMethod) UserServiceMethod {
+func NewUserService(userStore user.UserStoreMethod, userKycStore userkyc.UserKYCStoreMethod, creditOptionStore creditOption.CreditOptionStoreMethod) UserServiceMethod {
 	return &UserService{
-		userStore:        userStore,
-		userKycStore:     userKycStore,
-		creditLimitStore: creditLimitStore,
+		userStore:         userStore,
+		userKycStore:      userKycStore,
+		creditOptionStore: creditOptionStore,
 	}
 }
 
 // GetUserByID is service level func to validate and get all user based id
 func (u *UserService) GetUserByID(request GetByIDServiceRequest) (UserServiceInfo, error) {
-	userInfo, err := u.userStore.GetUserInfoByID(int(request.UserId))
+	userInfo, err := u.userStore.GetUserInfoByID(request.UserId)
 	if err != nil || userInfo.ID <= 0 {
 		return UserServiceInfo{}, err
 	}
@@ -48,7 +48,7 @@ func (u *UserService) GetUserByID(request GetByIDServiceRequest) (UserServiceInf
 
 func (u *UserService) CreateUserKyc(request CreateUserKycRequest) error {
 	userKycInfo := models.UserKYC{
-		UserID:         uint(request.UserId),
+		UserID:         request.UserId,
 		NIK:            request.NIK,
 		LegalName:      request.LegalName,
 		BirthDate:      request.BirthDate,
@@ -59,21 +59,21 @@ func (u *UserService) CreateUserKyc(request CreateUserKycRequest) error {
 	}
 
 	// default credit limit
-	creditInfo := []models.CreditLimit{
+	creditInfo := []models.CreditOption{
 		{
-			UserID:        uint(request.UserId),
+			UserID:        request.UserId,
 			DefaultAmount: 100000000,
 			CurrentAmount: 100000000,
 			Tenor:         12,
 		},
 		{
-			UserID:        uint(request.UserId),
+			UserID:        request.UserId,
 			DefaultAmount: 500000000,
 			CurrentAmount: 500000000,
 			Tenor:         24,
 		},
 		{
-			UserID:        uint(request.UserId),
+			UserID:        request.UserId,
 			DefaultAmount: 800000000,
 			CurrentAmount: 800000000,
 			Tenor:         36,
@@ -85,7 +85,7 @@ func (u *UserService) CreateUserKyc(request CreateUserKycRequest) error {
 		return err
 	}
 
-	err = u.creditLimitStore.CreateCreditLimitBulk(creditInfo)
+	err = u.creditOptionStore.CreateCreditOptionBulk(creditInfo)
 	if err != nil {
 		return err
 	}

@@ -18,6 +18,7 @@ type Config struct {
 	PartnerHandler Handler  `yaml:"partner_handler"`
 	MaxCounter     int      `yaml:"max_find_counter"`
 	RabbitMQ       RabbitMQ `yaml:"rabbit_mq"`
+	Queue          []string `yaml:"queue"`
 }
 
 // Mysql struct to hold the configuration data for mysql

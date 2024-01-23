@@ -65,20 +65,4 @@ function test_rabbitmq_env() {
 
 
 
-function test_redis_env() {
-  name=$1
-  container=$2
-  sleep_time=$3
-
-  while true; do
-    local code=$(docker exec $container redis-cli ping)
-    if [[ "$code" == "PONG" ]]; then
-      echo "INFO: $name is ready"
-      break
-    fi
-    echo "INFO: $name is not ready... sleeping for a while before checking again"
-    sleep $sleep_time
-  done
-}
-
 main "$@"

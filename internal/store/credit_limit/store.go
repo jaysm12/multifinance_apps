@@ -1,4 +1,4 @@
-package creditLimit
+package creditOption
 
 import (
 	"errors"
@@ -8,27 +8,27 @@ import (
 	"gorm.io/gorm"
 )
 
-// CreditLimitStoreMethod is set of methods for interacting with a creditLimit storage system
-type CreditLimitStoreMethod interface {
-	CreateCreditLimitBulk(creditLimitinfo []models.CreditLimit) error
-	UpdateCreditLimit(creditLimitinfo models.CreditLimit) error
-	DeleteCreditLimit(creditLimitid uint) error
-	GetCreditLimitInfoByID(creditLimitid uint) (models.CreditLimit, error)
+// CreditOptionStoreMethod is set of methods for interacting with a creditOption storage system
+type CreditOptionStoreMethod interface {
+	CreateCreditOptionBulk(creditOptioninfo []models.CreditOption) error
+	UpdateCreditOption(creditOptioninfo models.CreditOption) error
+	DeleteCreditOption(creditOptionid uint) error
+	GetCreditOptionInfoByID(creditOptionid uint) (models.CreditOption, error)
 }
 
-// CreditLimitStore is list dependencies creditLimit store
-type CreditLimitStore struct {
+// CreditOptionStore is list dependencies creditOption store
+type CreditOptionStore struct {
 	db mysql.MysqlMethod
 }
 
-// NewCreditLimitStore is func to generate CreditLimitStoreMethod interface
-func NewCreditLimitStore(db mysql.MysqlMethod) CreditLimitStoreMethod {
-	return &CreditLimitStore{
+// NewCreditOptionStore is func to generate CreditOptionStoreMethod interface
+func NewCreditOptionStore(db mysql.MysqlMethod) CreditOptionStoreMethod {
+	return &CreditOptionStore{
 		db: db,
 	}
 }
 
-func (u *CreditLimitStore) getDB() (*gorm.DB, error) {
+func (u *CreditOptionStore) getDB() (*gorm.DB, error) {
 	db := u.db.GetDB()
 	if db == nil {
 		return nil, errors.New("database Client is not init")
@@ -37,24 +37,24 @@ func (u *CreditLimitStore) getDB() (*gorm.DB, error) {
 	return db, nil
 }
 
-// CreateCreditLimitBulk is func to store / create creditLimit info into database
-func (u *CreditLimitStore) CreateCreditLimitBulk(creditLimitinfo []models.CreditLimit) error {
+// CreateCreditOptionBulk is func to store / create creditOption info into database
+func (u *CreditOptionStore) CreateCreditOptionBulk(creditOptioninfo []models.CreditOption) error {
 	db, err := u.getDB()
 	if err != nil {
 		return err
 	}
 
-	return db.Create(&creditLimitinfo).Error
+	return db.Create(&creditOptioninfo).Error
 }
 
-// UpdateCreditLimit is func to edit / update creditLimit info into database
-func (u *CreditLimitStore) UpdateCreditLimit(creditLimitinfo models.CreditLimit) error {
+// UpdateCreditOption is func to edit / update creditOption info into database
+func (u *CreditOptionStore) UpdateCreditOption(creditOptioninfo models.CreditOption) error {
 	db, err := u.getDB()
 	if err != nil {
 		return err
 	}
 
-	result := db.Model(models.CreditLimit{}).Where("id = ?", creditLimitinfo.ID).Updates(creditLimitinfo)
+	result := db.Model(models.CreditOption{}).Where("id = ?", creditOptioninfo.ID).Updates(creditOptioninfo)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -62,33 +62,33 @@ func (u *CreditLimitStore) UpdateCreditLimit(creditLimitinfo models.CreditLimit)
 	return nil
 }
 
-// DeleteCreditLimit is func to delete creditLimit info on database
-func (u *CreditLimitStore) DeleteCreditLimit(creditLimitid uint) error {
+// DeleteCreditOption is func to delete creditOption info on database
+func (u *CreditOptionStore) DeleteCreditOption(creditOptionid uint) error {
 	db, err := u.getDB()
 	if err != nil {
 		return err
 	}
 
-	creditLimit := models.CreditLimit{
+	creditOption := models.CreditOption{
 		Model: gorm.Model{
-			ID: uint(creditLimitid),
+			ID: uint(creditOptionid),
 		},
 	}
 
-	return db.Delete(&creditLimit).Error
+	return db.Delete(&creditOption).Error
 }
 
-// GetCreditLimitByID is func to get creditLimit info by id on database
-func (u *CreditLimitStore) GetCreditLimitInfoByID(creditLimitid uint) (models.CreditLimit, error) {
-	var creditLimit models.CreditLimit
+// GetCreditOptionByID is func to get creditOption info by id on database
+func (u *CreditOptionStore) GetCreditOptionInfoByID(creditOptionid uint) (models.CreditOption, error) {
+	var creditOption models.CreditOption
 	db, err := u.getDB()
 	if err != nil {
-		return models.CreditLimit{}, err
+		return models.CreditOption{}, err
 	}
 
-	if err := db.First(&creditLimit, creditLimitid).Error; err != nil {
-		return models.CreditLimit{}, err
+	if err := db.First(&creditOption, creditOptionid).Error; err != nil {
+		return models.CreditOption{}, err
 	}
 
-	return creditLimit, nil
+	return creditOption, nil
 }

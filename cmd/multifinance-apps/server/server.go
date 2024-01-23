@@ -11,13 +11,15 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/jaysm12/multifinance-apps/cmd/multifinance-apps/config"
+	installmentConsumer "github.com/jaysm12/multifinance-apps/internal/consumer/installment"
 	"github.com/jaysm12/multifinance-apps/internal/handler/authentication"
+	"github.com/jaysm12/multifinance-apps/internal/handler/installment"
 	"github.com/jaysm12/multifinance-apps/internal/handler/middleware"
 	"github.com/jaysm12/multifinance-apps/internal/handler/user"
 	authService "github.com/jaysm12/multifinance-apps/internal/service/authentication"
 	installmentService "github.com/jaysm12/multifinance-apps/internal/service/installment"
 	userService "github.com/jaysm12/multifinance-apps/internal/service/user"
-	creditLimitStore "github.com/jaysm12/multifinance-apps/internal/store/credit_limit"
+	creditOptionStore "github.com/jaysm12/multifinance-apps/internal/store/credit_limit"
 	installmentStore "github.com/jaysm12/multifinance-apps/internal/store/installment"
 	installmentPaymentHistoryStore "github.com/jaysm12/multifinance-apps/internal/store/installment_payment_history"
 	userStore "github.com/jaysm12/multifinance-apps/internal/store/user"
@@ -39,11 +41,12 @@ type Server struct {
 	middleware                           middleware.Middleware
 	authHandler                          authentication.AuthenticationHandler
 	userHandler                          user.UserHandler
+	installmentHandler                   installment.InstallmentHandler
 	authServiceMethod                    authService.AuthenticationServiceMethod
 	userStoreMethod                      userStore.UserStoreMethod
 	userKycStoreMethod                   userKycStore.UserKYCStoreMethod
 	installmentStoreMethod               installmentStore.InstallmentStoreMethod
-	creditLimitStoreMethod               creditLimitStore.CreditLimitStoreMethod
+	creditOptionStoreMethod              creditOptionStore.CreditOptionStoreMethod
 	installmentPaymentHistoryStoreMethod installmentPaymentHistoryStore.InstallmentPaymentHistoryStoreMethod
 	userServiceMethod                    userService.UserServiceMethod
 	installmentServiceMethod             installmentService.InstallmentServiceMethod
@@ -83,6 +86,9 @@ func NewServer() (*Server, error) {
 		}
 
 		s.mysql = mysqlMethod
+
+		// run migration
+		RunMigration(s.mysql.GetDB())
 
 		log.Println("Init-Mysql")
 	}
@@ -135,8 +141,8 @@ func NewServer() (*Server, error) {
 	}
 
 	{
-		creditLimitStoreMethod := creditLimitStore.NewCreditLimitStore(s.mysql)
-		s.creditLimitStoreMethod = creditLimitStoreMethod
+		creditOptionStoreMethod := creditOptionStore.NewCreditOptionStore(s.mysql)
+		s.creditOptionStoreMethod = creditOptionStoreMethod
 		log.Println("Init-Credit Limit Store")
 	}
 
@@ -149,7 +155,7 @@ func NewServer() (*Server, error) {
 	// // ======== Init Dependencies Service ========
 	// // Init User Service
 	{
-		userServiceMethod := userService.NewUserService(s.userStoreMethod, s.userKycStoreMethod, s.creditLimitStoreMethod)
+		userServiceMethod := userService.NewUserService(s.userStoreMethod, s.userKycStoreMethod, s.creditOptionStoreMethod)
 		s.userServiceMethod = userServiceMethod
 		log.Println("Init-User Service")
 	}
@@ -161,16 +167,29 @@ func NewServer() (*Server, error) {
 	}
 
 	{
-		installmentServiceMethod := installmentService.NewInstallmentService(s.installmentStoreMethod, s.userStoreMethod, s.creditLimitStoreMethod, s.installmentPaymentHistoryStoreMethod)
+		installmentServiceMethod := installmentService.NewInstallmentService(s.installmentStoreMethod, s.userStoreMethod, s.creditOptionStoreMethod, s.installmentPaymentHistoryStoreMethod)
 		s.installmentServiceMethod = installmentServiceMethod
 		log.Println("Init-Installment Service")
 	}
 
-	// {
-	// 	partnerService := partner_service.NewPartnerService(s.userStore, s.userHistStore, s.partnerStore, s.cfg.MaxCounter)
-	// 	s.partnerService = partnerService
-	// 	log.Println("Init-Partner Service")
-	// }
+	// init ConsumerInstallment
+	{
+		installmentConsumerMethod := installmentConsumer.NewInstallmentConsumer(s.installmentServiceMethod, s.rabbitMqClient)
+		errChan := make(chan error, 2)
+		go installmentConsumerMethod.CreateInstallmentConsumer(errChan)
+		go installmentConsumerMethod.PayInstallmentConsumer(errChan)
+
+		go func() {
+			for i := 0; i < 2; i++ {
+				errFromConsumer := <-errChan
+				if errFromConsumer != nil {
+					log.Printf("Error from consumer: %v", errFromConsumer)
+				}
+			}
+		}()
+
+		log.Println("Init-Installment Consumer")
+	}
 
 	// // ======== Init Dependencies Handler ========
 	// Init Middleware
@@ -198,15 +217,14 @@ func NewServer() (*Server, error) {
 		log.Println("Init-Auth Handler")
 	}
 
-	// Generate Seed
-	// {
-	// 	err := seed.GenerateSeed(s.userStore, s.hashMethod)
-	// 	if err != nil {
-	// 		fmt.Print("[Got Error]-Seed :", err)
-	// 		return s, err
-	// 	}
-	// 	log.Println("Init-Seed")
-	// }
+	// Init installment handler
+	{
+		var opts []installment.Option
+		opts = append(opts, installment.WithTimeoutOptions(s.cfg.AuthHandler.TimeoutInSec))
+		installmentHandler := installment.NewInstallmentHandler(s.installmentServiceMethod, s.rabbitMqClient, opts...)
+		s.installmentHandler = *installmentHandler
+		log.Println("Init-Installment Handler")
+	}
 
 	// Init Router
 	{
@@ -216,6 +234,9 @@ func NewServer() (*Server, error) {
 		r.HandleFunc("/v1/register", s.authHandler.RegisterUserHandler).Methods("POST")
 
 		r.HandleFunc("/v1/user/kyc", s.middleware.MiddlewareVerifyToken(s.userHandler.CreateUserKyc)).Methods("POST")
+
+		r.HandleFunc("/v1/installment", s.middleware.MiddlewareVerifyToken(s.installmentHandler.CreateInstallment)).Methods("POST")
+		r.HandleFunc("/v1/pay-installment/{contract_id}", s.middleware.MiddlewareVerifyToken(s.installmentHandler.PayInstallment)).Methods("POST")
 
 		port := ":" + s.cfg.Port
 		log.Println("running on port ", port)
@@ -245,6 +266,8 @@ func (s *Server) Start() int {
 	// Create a context with a timeout to allow the server to cleanly shut down
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
+	defer s.rabbitMqClient.Connection.Close()
+	defer s.rabbitMqClient.Channel.Close()
 	s.httpServer.Shutdown(ctx)
 	log.Println("complete, shutting down.")
 	return 0

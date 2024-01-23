@@ -1,8 +1,6 @@
 package mysql
 
 import (
-	"fmt"
-
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -27,7 +25,6 @@ type Client struct {
 }
 
 func NewMysqlClient(config interface{}) (MysqlMethod, error) {
-	fmt.Println(config.(string), "kocak")
 	db, err := gorm.Open(mysql.Open(config.(string)), &gorm.Config{})
 	if err != nil {
 		return nil, err

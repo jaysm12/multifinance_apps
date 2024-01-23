@@ -2,7 +2,7 @@ package models
 
 import "gorm.io/gorm"
 
-type CreditLimit struct {
+type CreditOption struct {
 	gorm.Model
 	UserID        uint
 	DefaultAmount float64

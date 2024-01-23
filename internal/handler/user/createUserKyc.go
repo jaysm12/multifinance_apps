@@ -14,7 +14,6 @@ import (
 )
 
 type CreateUserKycRequest struct {
-	UserId         int    `json:"user_id"`
 	NIK            string `json:"nik"`
 	LegalName      string `json:"legal_name"`
 	BirthDate      string `json:"birth_date"`
@@ -65,12 +64,6 @@ func (h *UserHandler) CreateUserKyc(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if body.UserId <= 0 {
-		code = http.StatusBadRequest
-		err = fmt.Errorf("user id is required")
-		return
-	}
-
 	if len(body.NIK) < 1 {
 		code = http.StatusBadRequest
 		err = fmt.Errorf("nik is required")
@@ -80,7 +73,7 @@ func (h *UserHandler) CreateUserKyc(w http.ResponseWriter, r *http.Request) {
 	errChan := make(chan error, 1)
 	go func(ctx context.Context) {
 		err = h.service.CreateUserKyc(user.CreateUserKycRequest{
-			UserId:         body.UserId,
+			UserId:         r.Context().Value("id").(uint),
 			NIK:            body.NIK,
 			LegalName:      body.LegalName,
 			BirthDate:      body.BirthDate,

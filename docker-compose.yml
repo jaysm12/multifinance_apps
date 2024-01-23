@@ -5,7 +5,7 @@ services:
     image: mysql:8.0
     container_name: mysql_local
     ports:
-      - "3306:3306"
+      - "3335:3306"
     environment:
       MYSQL_ROOT_PASSWORD: "password"
       MYSQL_DATABASE: "multifinance-apps"
@@ -14,7 +14,7 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
   amqp:
-    image: rabbitmq:latest
+    image: rabbitmq:management
     container_name: rabbitmq_local
     restart: always
     ports:

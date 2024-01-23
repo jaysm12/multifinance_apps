@@ -12,13 +12,15 @@ var (
 )
 
 type CreateInstallmentRequest struct {
-	CreditLimitID uint
-	UserID        int
-	OtrAmount     float64
-	AssetName     string
+	CreditOptionID uint
+	UserID         uint
+	OtrAmount      float64
+	AssetName      string
 }
 
 type PayInstallmentRequest struct {
+	UserID        uint
 	InstallmentID uint
 	PaidAmount    float64
+	ContractID    string
 }

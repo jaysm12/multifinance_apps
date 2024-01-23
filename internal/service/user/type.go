@@ -39,11 +39,11 @@ type UpdateUserServiceRequest struct {
 
 // GetByIDServiceRequest is list parameter for get user by id
 type GetByIDServiceRequest struct {
-	UserId int
+	UserId uint
 }
 
 type CreateUserKycRequest struct {
-	UserId         int
+	UserId         uint
 	NIK            string `json:"nik"`
 	LegalName      string `json:"legal_name"`
 	BirthDate      string `json:"birth_date"`
