@@ -1,0 +1,30 @@
+version: '3.7'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_local
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "password"
+      MYSQL_DATABASE: "multifinance-apps"
+      MYSQL_USER: "jays"
+      MYSQL_PASSWORD: "password"
+    volumes:
+      - mysql_data:/var/lib/mysql
+  amqp:
+    image: rabbitmq:latest
+    container_name: rabbitmq_local
+    restart: always
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    volumes:
+      - ./volumes/rabbitmq:/var/lib/rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=jays
+      - RABBITMQ_DEFAULT_PASS=password
+
+volumes:
+  mysql_data:

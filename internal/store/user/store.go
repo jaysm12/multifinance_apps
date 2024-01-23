@@ -5,7 +5,7 @@ import (
 
 	"github.com/jaysm12/multifinance-apps/models"
 	"github.com/jaysm12/multifinance-apps/pkg/mysql"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 // UserStoreMethod is set of methods for interacting with a user storage system
@@ -124,10 +124,10 @@ func (u *UserStore) Count() (int, error) {
 		return 0, err
 	}
 
-	var count int
+	var count int64
 	if err := db.Model(&user).Count(&count).Error; err != nil {
 		return 0, err
 	}
 
-	return count, nil
+	return int(count), nil
 }

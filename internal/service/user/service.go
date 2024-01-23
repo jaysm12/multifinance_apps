@@ -5,13 +5,10 @@ import (
 	"github.com/jaysm12/multifinance-apps/internal/store/user"
 	userkyc "github.com/jaysm12/multifinance-apps/internal/store/user_kyc"
 	"github.com/jaysm12/multifinance-apps/models"
-	"github.com/jaysm12/multifinance-apps/pkg/hash"
 )
 
 // UserServiceMethod is list method for User Service
 type UserServiceMethod interface {
-	DeleteUser(DeleteUserServiceRequest) error
-	UpdateUser(UpdateUserServiceRequest) (UserServiceInfo, error)
 	GetUserByID(GetByIDServiceRequest) (UserServiceInfo, error)
 	CreateUserKyc(request CreateUserKycRequest) error
 }
@@ -21,77 +18,15 @@ type UserService struct {
 	userStore        user.UserStoreMethod
 	userKycStore     userkyc.UserKYCStoreMethod
 	creditLimitStore creditLimit.CreditLimitStoreMethod
-	hash             hash.HashMethod
 }
 
 // NewUserService is func to generate UserServiceMethod interface
-func NewUserService(userStore user.UserStoreMethod, userKycStore userkyc.UserKYCStoreMethod, creditLimitStore creditLimit.CreditLimitStoreMethod, hash hash.HashMethod) UserServiceMethod {
+func NewUserService(userStore user.UserStoreMethod, userKycStore userkyc.UserKYCStoreMethod, creditLimitStore creditLimit.CreditLimitStoreMethod) UserServiceMethod {
 	return &UserService{
-		hash:             hash,
 		userStore:        userStore,
 		userKycStore:     userKycStore,
 		creditLimitStore: creditLimitStore,
 	}
-}
-
-// DeleteUser is service level func to validate and delete user info in database
-func (u *UserService) DeleteUser(request DeleteUserServiceRequest) error {
-	if request.UserId <= 0 {
-		return ErrDataNotFound
-	}
-
-	userInfo, err := u.userStore.GetUserInfoByID(request.UserId)
-	if err != nil || userInfo.ID <= 0 {
-		return err
-	}
-
-	if !u.hash.CompareValue(userInfo.Password, request.Password) {
-		return ErrPasswordIsIncorrect
-	}
-
-	return u.userStore.DeleteUser(int(userInfo.ID))
-}
-
-// UpdateUser is service level func to validate and update user info in database
-func (u *UserService) UpdateUser(request UpdateUserServiceRequest) (UserServiceInfo, error) {
-	if request.UserId <= 0 {
-		return UserServiceInfo{}, ErrDataNotFound
-	}
-
-	userInfo, err := u.userStore.GetUserInfoByID(request.UserId)
-	if err != nil || userInfo.ID <= 0 {
-		return UserServiceInfo{}, err
-	}
-
-	if len(request.Password) > 0 {
-		hashPassword, err := u.hash.HashValue(request.Password)
-		if err != nil {
-			return UserServiceInfo{}, err
-		}
-
-		userInfo.Password = string(hashPassword)
-	}
-
-	if len(request.Email) > 0 {
-		userInfo.Email = request.Email
-	}
-
-	if len(request.Fullname) > 0 {
-		userInfo.Fullname = request.Fullname
-	}
-
-	err = u.userStore.UpdateUser(userInfo)
-	if err != nil {
-		return UserServiceInfo{}, err
-	}
-
-	return UserServiceInfo{
-		UserId:      int(userInfo.ID),
-		Username:    userInfo.Username,
-		Fullname:    userInfo.Fullname,
-		Email:       userInfo.Email,
-		CreatedDate: userInfo.CreatedAt.String(),
-	}, nil
 }
 
 // GetUserByID is service level func to validate and get all user based id

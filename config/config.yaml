@@ -1,11 +1,15 @@
 port: 32001
 mysql :
-  mysql_config : <mysql_config>
+  mysql_config : "jays:password@tcp(localhost:3306)/multifinance-apps?charset=utf8mb4&parseTime=True&loc=Local"
+rabbit_mq:
+  rabbit_mq_config : "amqp://jays:password@localhost:5672/"
 hash :
   cost : 10
 token :
-  secret : <token_secret>
+  secret : "secretkey"
   exp_in_hour : 3
 auth_handler :
+  timeout_in_sec : 5
+installment_handler :
   timeout_in_sec : 5
 max_find_counter : 10

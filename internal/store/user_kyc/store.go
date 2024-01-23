@@ -5,7 +5,7 @@ import (
 
 	"github.com/jaysm12/multifinance-apps/models"
 	"github.com/jaysm12/multifinance-apps/pkg/mysql"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type UserKYCStoreMethod interface {
@@ -13,7 +13,6 @@ type UserKYCStoreMethod interface {
 	UpdateUserKYC(userinfo models.UserKYC) error
 	DeleteUserKYC(userKycId int) error
 	GetUserKYCInfoByUserID(userid int) (models.UserKYC, error)
-	Count() (int, error)
 }
 
 // UserKYCStore is list dependencies user store
@@ -106,20 +105,4 @@ func (u *UserKYCStore) GetUserKYCInfoByUserID(userid int) (models.UserKYC, error
 	}
 
 	return user, nil
-}
-
-// Count is func to get total user on database
-func (u *UserKYCStore) Count() (int, error) {
-	var user models.UserKYC
-	db, err := u.getDB()
-	if err != nil {
-		return 0, err
-	}
-
-	var count int
-	if err := db.Model(&user).Count(&count).Error; err != nil {
-		return 0, err
-	}
-
-	return count, nil
 }

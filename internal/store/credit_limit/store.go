@@ -5,7 +5,7 @@ import (
 
 	"github.com/jaysm12/multifinance-apps/models"
 	"github.com/jaysm12/multifinance-apps/pkg/mysql"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 // CreditLimitStoreMethod is set of methods for interacting with a creditLimit storage system
@@ -14,7 +14,6 @@ type CreditLimitStoreMethod interface {
 	UpdateCreditLimit(creditLimitinfo models.CreditLimit) error
 	DeleteCreditLimit(creditLimitid uint) error
 	GetCreditLimitInfoByID(creditLimitid uint) (models.CreditLimit, error)
-	Count() (int, error)
 }
 
 // CreditLimitStore is list dependencies creditLimit store
@@ -92,20 +91,4 @@ func (u *CreditLimitStore) GetCreditLimitInfoByID(creditLimitid uint) (models.Cr
 	}
 
 	return creditLimit, nil
-}
-
-// Count is func to get total creditLimit on database
-func (u *CreditLimitStore) Count() (int, error) {
-	var creditLimit models.CreditLimit
-	db, err := u.getDB()
-	if err != nil {
-		return 0, err
-	}
-
-	var count int
-	if err := db.Model(&creditLimit).Count(&count).Error; err != nil {
-		return 0, err
-	}
-
-	return count, nil
 }

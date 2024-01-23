@@ -1,8 +1,10 @@
 package mysql
 
 import (
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"fmt"
+
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 // MysqlConfig is list config to create Mysql client
@@ -24,9 +26,9 @@ type Client struct {
 	db *gorm.DB
 }
 
-// NewMysqlClient is func to create Mysql client
 func NewMysqlClient(config interface{}) (MysqlMethod, error) {
-	db, err := gorm.Open("Mysql", config)
+	fmt.Println(config.(string), "kocak")
+	db, err := gorm.Open(mysql.Open(config.(string)), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}

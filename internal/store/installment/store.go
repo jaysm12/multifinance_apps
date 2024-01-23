@@ -5,7 +5,7 @@ import (
 
 	"github.com/jaysm12/multifinance-apps/models"
 	"github.com/jaysm12/multifinance-apps/pkg/mysql"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 // InstallmentStoreMethod is set of methods for interacting with a installment storage system
