@@ -19,8 +19,7 @@ type CreateInstallmentRequest struct {
 }
 
 type PayInstallmentRequest struct {
-	UserID        uint
-	InstallmentID uint
-	PaidAmount    float64
-	ContractID    string
+	UserID     uint
+	PaidAmount float64
+	ContractID string
 }

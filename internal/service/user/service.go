@@ -1,7 +1,9 @@
 package user
 
 import (
-	creditOption "github.com/jaysm12/multifinance-apps/internal/store/credit_limit"
+	"fmt"
+
+	creditOption "github.com/jaysm12/multifinance-apps/internal/store/credit_option"
 	"github.com/jaysm12/multifinance-apps/internal/store/user"
 	userkyc "github.com/jaysm12/multifinance-apps/internal/store/user_kyc"
 	"github.com/jaysm12/multifinance-apps/models"
@@ -9,7 +11,6 @@ import (
 
 // UserServiceMethod is list method for User Service
 type UserServiceMethod interface {
-	GetUserByID(GetByIDServiceRequest) (UserServiceInfo, error)
 	CreateUserKyc(request CreateUserKycRequest) error
 }
 
@@ -27,23 +28,6 @@ func NewUserService(userStore user.UserStoreMethod, userKycStore userkyc.UserKYC
 		userKycStore:      userKycStore,
 		creditOptionStore: creditOptionStore,
 	}
-}
-
-// GetUserByID is service level func to validate and get all user based id
-func (u *UserService) GetUserByID(request GetByIDServiceRequest) (UserServiceInfo, error) {
-	userInfo, err := u.userStore.GetUserInfoByID(request.UserId)
-	if err != nil || userInfo.ID <= 0 {
-		return UserServiceInfo{}, err
-	}
-
-	return UserServiceInfo{
-		UserId:      int(userInfo.ID),
-		Username:    userInfo.Username,
-		Fullname:    userInfo.Fullname,
-		Email:       userInfo.Email,
-		IsVerified:  userInfo.IsVerified,
-		CreatedDate: userInfo.CreatedAt.String(),
-	}, nil
 }
 
 func (u *UserService) CreateUserKyc(request CreateUserKycRequest) error {
@@ -87,6 +71,7 @@ func (u *UserService) CreateUserKyc(request CreateUserKycRequest) error {
 
 	err = u.creditOptionStore.CreateCreditOptionBulk(creditInfo)
 	if err != nil {
+		fmt.Println("masuk")
 		return err
 	}
 

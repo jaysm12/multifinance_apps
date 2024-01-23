@@ -11,6 +11,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/jaysm12/multifinance-apps/cmd/multifinance-apps/config"
+	"github.com/jaysm12/multifinance-apps/cmd/multifinance-apps/server/util"
 	installmentConsumer "github.com/jaysm12/multifinance-apps/internal/consumer/installment"
 	"github.com/jaysm12/multifinance-apps/internal/handler/authentication"
 	"github.com/jaysm12/multifinance-apps/internal/handler/installment"
@@ -19,7 +20,7 @@ import (
 	authService "github.com/jaysm12/multifinance-apps/internal/service/authentication"
 	installmentService "github.com/jaysm12/multifinance-apps/internal/service/installment"
 	userService "github.com/jaysm12/multifinance-apps/internal/service/user"
-	creditOptionStore "github.com/jaysm12/multifinance-apps/internal/store/credit_limit"
+	creditOptionStore "github.com/jaysm12/multifinance-apps/internal/store/credit_option"
 	installmentStore "github.com/jaysm12/multifinance-apps/internal/store/installment"
 	installmentPaymentHistoryStore "github.com/jaysm12/multifinance-apps/internal/store/installment_payment_history"
 	userStore "github.com/jaysm12/multifinance-apps/internal/store/user"
@@ -88,7 +89,7 @@ func NewServer() (*Server, error) {
 		s.mysql = mysqlMethod
 
 		// run migration
-		RunMigration(s.mysql.GetDB())
+		util.RunMigration(s.mysql.GetDB())
 
 		log.Println("Init-Mysql")
 	}
@@ -102,6 +103,10 @@ func NewServer() (*Server, error) {
 		}
 
 		s.rabbitMqClient = rabbitmqClient
+
+		// flush queue
+		util.FlushQueue(s.cfg.Queues, s.rabbitMqClient)
+		log.Println("Flush-Queue")
 
 		log.Println("Init-RabbitMQ")
 	}

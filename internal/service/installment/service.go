@@ -5,7 +5,7 @@ import (
 	"math/rand"
 	"time"
 
-	creditOption "github.com/jaysm12/multifinance-apps/internal/store/credit_limit"
+	creditOption "github.com/jaysm12/multifinance-apps/internal/store/credit_option"
 	"github.com/jaysm12/multifinance-apps/internal/store/installment"
 	installmentPaymentHistory "github.com/jaysm12/multifinance-apps/internal/store/installment_payment_history"
 	"github.com/jaysm12/multifinance-apps/internal/store/user"
@@ -76,6 +76,7 @@ func (i *InstallmentService) CreateInstallment(request CreateInstallmentRequest)
 		Status:                 models.InstallmentStatusInProgress,
 		AdminFee:               defaultAdminFee,
 		Tenor:                  cl.Tenor,
+		RemainingAmount:        totalInstallment,
 	}
 
 	err = i.storeInstallment.CreateInstallment(installmentInfo)

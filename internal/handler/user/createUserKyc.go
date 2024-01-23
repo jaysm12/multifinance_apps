@@ -30,7 +30,7 @@ func (h *UserHandler) CreateUserKyc(w http.ResponseWriter, r *http.Request) {
 
 	var err error
 	var response utilhttp.StandardResponse
-	var code int = http.StatusOK
+	var code int = http.StatusCreated
 
 	defer func() {
 		response.Code = code
@@ -53,14 +53,14 @@ func (h *UserHandler) CreateUserKyc(w http.ResponseWriter, r *http.Request) {
 	data, err := io.ReadAll(r.Body)
 	if err != nil {
 		code = http.StatusBadRequest
-		err = fmt.Errorf("bad Request")
+		err = fmt.Errorf("bad request")
 		return
 	}
 
 	err = json.Unmarshal(data, &body)
 	if err != nil {
 		code = http.StatusBadRequest
-		err = fmt.Errorf("bad Request")
+		err = fmt.Errorf("bad request")
 		return
 	}
 

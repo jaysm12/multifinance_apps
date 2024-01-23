@@ -56,21 +56,21 @@ func (h *AuthenticationHandler) LoginUserHandler(w http.ResponseWriter, r *http.
 	data, err := io.ReadAll(r.Body)
 	if err != nil {
 		code = http.StatusBadRequest
-		err = fmt.Errorf("bad Request")
+		err = fmt.Errorf("bad request")
 		return
 	}
 
 	err = json.Unmarshal(data, &body)
 	if err != nil {
 		code = http.StatusBadRequest
-		err = fmt.Errorf("bad Request")
+		err = fmt.Errorf("bad request")
 		return
 	}
 
 	// checking valid body
 	if len(body.Username) < 1 || len(body.Password) < 1 {
 		code = http.StatusBadRequest
-		err = fmt.Errorf("invalid Parameter Request")
+		err = fmt.Errorf("invalid parameter request")
 		return
 	}
 

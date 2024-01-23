@@ -13,3 +13,4 @@ auth_handler :
 installment_handler :
   timeout_in_sec : 5
 max_find_counter : 10
+queues : ["create_installment", "pay_installment"]

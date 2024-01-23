@@ -59,14 +59,14 @@ func (h *InstallmentHandler) PayInstallment(w http.ResponseWriter, r *http.Reque
 	data, err := io.ReadAll(r.Body)
 	if err != nil {
 		code = http.StatusBadRequest
-		err = fmt.Errorf("bad Request")
+		err = fmt.Errorf("bad request")
 		return
 	}
 
 	err = json.Unmarshal(data, &body)
 	if err != nil {
 		code = http.StatusBadRequest
-		err = fmt.Errorf("bad Request")
+		err = fmt.Errorf("bad request")
 		return
 	}
 
@@ -75,7 +75,7 @@ func (h *InstallmentHandler) PayInstallment(w http.ResponseWriter, r *http.Reque
 
 	if body.InstallmentID == 0 {
 		code = http.StatusBadRequest
-		err = fmt.Errorf("bad Request")
+		err = fmt.Errorf("bad request")
 		return
 	}
 
