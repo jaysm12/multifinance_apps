@@ -64,6 +64,7 @@ func (i *InstallmentService) CreateInstallment(request CreateInstallmentRequest)
 	totalInstallment, monthlyAmount, totalInterest, interestPerMonth := calculateInstallmentDetails(request.OtrAmount+adminFee, defaultInterest, cl.Tenor)
 
 	installmentInfo := models.Installment{
+		UserID:                 uint(request.UserID),
 		CreditOptionID:         uint(request.CreditOptionID),
 		ContractID:             generateContractID(),
 		AssetName:              request.AssetName,

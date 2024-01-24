@@ -17,6 +17,7 @@ const (
 
 type Installment struct {
 	gorm.Model
+	UserID                 uint
 	CreditOptionID         uint
 	ContractID             string `gorm:"column:contract_id"`
 	AssetName              string
