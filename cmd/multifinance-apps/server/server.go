@@ -104,9 +104,9 @@ func NewServer() (*Server, error) {
 
 		s.rabbitMqClient = rabbitmqClient
 
-		// flush queue
-		util.FlushQueue(s.cfg.Queues, s.rabbitMqClient)
-		log.Println("Flush-Queue")
+		// uncomment to flush queue and make fresh queue
+		// util.FlushQueue(s.cfg.Queues, s.rabbitMqClient)
+		// log.Println("Flush-Queue")
 
 		log.Println("Init-RabbitMQ")
 	}
