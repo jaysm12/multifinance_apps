@@ -73,3 +73,6 @@ to run go test you can use :
 ```
 make test
 ```
+
+## Postman Collection
+You can check out the Endpoint by importing the postman collection on `./Multifinance-apps.postman_collection`
