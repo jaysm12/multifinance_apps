@@ -38,9 +38,8 @@ make deps-init
 ```
 The deps-init command will perform the following actions:
 
-+ Build Vault and store secrets
-+ Build Redis and verify that it is running
-+ Build Postgres and verify that it is running
++ Build RabbitMQ and verify that it is running
++ Build Mysql and verify that it is running
   
 To stop the dependencies, run :
 ```
